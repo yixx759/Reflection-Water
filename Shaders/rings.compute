@@ -1,0 +1,81 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+#pragma kernel Clear
+
+
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWTexture2D<half> Result;
+
+float a;
+float d0;
+float d1;
+float b;
+float adder;
+float thresh;
+float flatner;
+
+float2 cent;
+
+#define TAU 6.28318
+
+
+float invLerp(float from, float to, float value){
+    return (value - from) / (to - from);
+}
+
+
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    
+    
+    float2 tofrom = id.xy  - cent;
+
+    
+    if(length(tofrom)+adder < a && length(tofrom)+adder  >b)
+    {
+
+        
+        float a1 = invLerp(b,  a,length(tofrom)+adder);
+        float nua  = abs(sin((a1*TAU/2)));
+        
+        //float togo  = HermiteCurve(d0, d1,nua);
+        float togo  = nua;
+        
+        
+        
+        //divde by 2 
+        Result[id.xy] = (togo/flatner)+adder*0.006;
+        
+    }
+    else
+    {
+        Result[id.xy] = Result[id.xy];
+    }
+    
+
+    
+    
+}
+
+
+[numthreads(8,8,1)]
+void Clear (uint3 id : SV_DispatchThreadID)
+{
+    
+    
+  
+        Result[id.xy] = 0;
+    
+    
+
+    
+    
+}
+
+
+
